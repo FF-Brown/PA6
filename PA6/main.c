@@ -8,6 +8,20 @@
 
 int main(void) {
 
+	//Declare variables, seed rand()
+	int ship_placement = 0;
+	char player_board[MAX_ROWS][MAX_COL] = { 0 };
+	char pc_board[MAX_ROWS][MAX_COL] = { 0 };
+
+	initialize_board(player_board, MAX_ROWS, MAX_COL);
+	initialize_board(pc_board, MAX_ROWS, MAX_COL);
+	display_menu();
+	ship_placement = choose_ship_placement();
+	if (ship_placement == 1)
+		ship_placement_manual();
+	else if (ship_placement == 2)
+		ship_placement_auto();
+	display_board(player_board);
 
 	return 0;
 }
