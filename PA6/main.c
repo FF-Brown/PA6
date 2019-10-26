@@ -13,15 +13,62 @@ int main(void) {
 	char player_board[MAX_ROWS][MAX_COL] = { 0 };
 	char pc_board[MAX_ROWS][MAX_COL] = { 0 };
 
+	//Initialize structs
+	Carrier carrier1 = {
+		.position = {{0,0},{0,0},{0,0},{0,0},{0,0}},
+		.hits = 0
+	};
+	Battleship battleship1 = {
+	.position = {{0,0},{0,0},{0,0},{0,0}},
+	.hits = 0
+	};
+	Cruiser cruiser1 = {
+	.position = {{0,0},{0,0},{0,0}},
+	.hits = 0
+	};
+	Submarine sub1 = {
+	.position = {{0,0},{0,0},{0,0}},
+	.hits = 0
+	};
+	Destroyer destroyer1 = {
+	.position = {{0,0},{0,0}},
+	.hits = 0
+	};
+	Carrier carrier2 = {
+	.position = {{0,0},{0,0},{0,0},{0,0},{0,0}},
+	.hits = 0
+	};
+	Battleship battleship2 = {
+	.position = {{0,0},{0,0},{0,0},{0,0}},
+	.hits = 0
+	};
+	Cruiser cruiser2 = {
+	.position = {{0,0},{0,0},{0,0}},
+	.hits = 0
+	};
+	Submarine sub2 = {
+	.position = {{0,0},{0,0},{0,0}},
+	.hits = 0
+	};
+	Destroyer destroyer2 = {
+	.position = {{0,0},{0,0}},
+	.hits = 0
+	};
+
+	//Initialize arrays
 	initialize_board(player_board, MAX_ROWS, MAX_COL);
 	initialize_board(pc_board, MAX_ROWS, MAX_COL);
+
 	display_menu();
 	ship_placement = choose_ship_placement();
-	if (ship_placement == 1)
+	if (ship_placement == 1) {
+		display_board(player_board, pc_board);
 		ship_placement_manual();
-	else if (ship_placement == 2)
+	}
+	else if (ship_placement == 2) {
 		ship_placement_auto();
-	display_board(player_board);
+		display_board(player_board, pc_board);
+	}
 
 	return 0;
 }

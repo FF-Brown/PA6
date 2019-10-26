@@ -30,13 +30,13 @@ void display_menu(void)
 		//Run process based on input
 		switch (option) {
 		case RULES:
-			//system("cls");
+			system("cls");
 			rules();
 			display_menu();
 			break;
 			//Leave switch and while loop to begin playing game
 		case PLAY:
-			//system("cls");
+			system("cls");
 			printf("Good luck!\n\n");
 			break;
 			//Exit program
@@ -74,7 +74,7 @@ void initialize_board(char player_board[][MAX_COL], int rows, int columns)
 		}
 	}
 }
-void display_board(char player_board[][MAX_COL])
+void display_board(char player_board[][MAX_COL], char pc_board[][MAX_COL])
 {
 	int current_element = 0;
 	int i = 0;
@@ -86,7 +86,19 @@ void display_board(char player_board[][MAX_COL])
 		}
 		printf("\n");
 	}
+	printf("\n");
 	
+	printf("   0 1 2 3 4 5 6 7 8 9 \n");
+	for (i = 0; i < MAX_ROWS; i++) {
+		printf(" %d ", i);
+		for (int j = 0; j < MAX_COL; j++) {
+			if (pc_board[i][j] == 'x' || pc_board[i][j] == 'o' || pc_board[i][j] == '~')
+				printf("%c ", pc_board[i][j]);
+			else
+				printf("~ ");
+		}
+		printf("\n");
+	}
 
 }
 /*

@@ -15,15 +15,35 @@
 #include <stdlib.h>
 #include <time.h>
 
-//typedef struct coordinate {
-//	int x;
-//	int y;
-//}Coordinate;
+typedef struct coordinate {
+	int x;
+	int y;
+}Coordinate;
+typedef struct carrier {
+	Coordinate position[5];
+	int hits;
+}Carrier;
+typedef struct battleship {
+	Coordinate position[4];
+	int hits;
+}Battleship;
+typedef struct cruiser {
+	Coordinate position[3];
+	int hits;
+}Cruiser;
+typedef struct submarine {
+	Coordinate position[3];
+	int hits;
+}Submarine;
+typedef struct destroyer {
+	Coordinate position[2];
+	int hits;
+}Destroyer;
 
 void display_menu(void);
 void rules(void);
 void initialize_board(char player_board[][MAX_COL], int rows, int columns);
-void display_board(char player_board);
+void display_board(char player_board[][MAX_COL], char pc_board[][MAX_COL]);
 int choose_ship_placement(void);
 void ship_placement_manual();
 void ship_placement_auto();
