@@ -82,38 +82,16 @@ void initialize_board(char player_board[][MAX_COL], int rows, int columns)
 	}
 }
 /*
-	Function: display_board()
+	Function: display_boards()
 	Date Created: 10/27/2019
 	Description: Displays both player and computer boards. Does not display computer ships (that would be cheating lol)
 	Preconditions: None
 	Postconditions: Boards displayed for further use
 */
-void display_board(char player_board[][MAX_COL], char pc_board[][MAX_COL])
+void display_boards(char player_board[][MAX_COL], char pc_board[][MAX_COL])
 {
-	int current_element = 0;
-	int i = 0;
-	printf("   0 1 2 3 4 5 6 7 8 9 \n");
-	for (i = 0; i < MAX_ROWS; i++) {
-		printf(" %d ", i);
-		for (int j = 0; j < MAX_COL; j++) {
-			printf("%c ", player_board[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-	
-	printf("   0 1 2 3 4 5 6 7 8 9 \n");
-	for (i = 0; i < MAX_ROWS; i++) {
-		printf(" %d ", i);
-		for (int j = 0; j < MAX_COL; j++) {
-			if (pc_board[i][j] == 'x' || pc_board[i][j] == 'o' || pc_board[i][j] == '~')
-				printf("%c ", pc_board[i][j]);
-			else
-				printf("~ ");
-		}
-		printf("\n");
-	}
-
+	display_player_board(player_board);
+	display_pc_board(pc_board);
 }
 /*
 	Function: chooose_ship_placement()
@@ -150,12 +128,11 @@ bool check_space(char player_board[][MAX_COL], Coordinate location)
 		printf("Error: x-coordinate out of range.\n");
 		available = false;
 	}
-	else if (location.y < 0 || location.y > 0) {
+	else if (location.y < 0 || location.y > 9) {
 		printf("Error: y-coordinate out of range.\n");
 		available = false; 
 	}
-
-	//Check that space is available
+	//Check that space is available (as long as it passes previous test)
 	else if (player_board[location.y][location.x] == '~')
 		available = true;
 	else {
@@ -183,6 +160,7 @@ void ship_placement_manual(char player_board[][MAX_COL])
 	
 	//Take input for each ship individually
 	for(int i = 0; i < 5; i++){
+		display_player_board(player_board);
 		do {
 			//Input starting coordinate
 			printf("First coordinate for %s: ", names[i]);
@@ -231,7 +209,7 @@ void ship_placement_manual(char player_board[][MAX_COL])
 			else
 				space = ship_spacer(player_board, starting_point, direction, length);
 			//Loop if invalid input or not enough space
-		} while (direction != 'N' && direction != 'n' && direction != 'E' && direction != 'e' && direction != 'S' && direction != 's' && direction != 'W' && direction != 'w' && !space);
+		} while ((direction != 'N' && direction != 'n' && direction != 'E' && direction != 'e' && direction != 'S' && direction != 's' && direction != 'W' && direction != 'w') || !space);
 		
 		//Builds boat in the direction chosen
 		switch (direction)
@@ -240,21 +218,25 @@ void ship_placement_manual(char player_board[][MAX_COL])
 		case 'N':
 			for (int i = 0; i < length; i++)
 				player_board[starting_point.y - i][starting_point.x] = escribe;
+			printf("Ship successfully placed.\n");
 			break;
 		case 'e':
 		case 'E':
 			for (int i = 0; i < length; i++)
 				player_board[starting_point.y][starting_point.x + i] = escribe;
+			printf("Ship successfully placed.\n");
 			break;
 		case 's':
 		case 'S':
 			for (int i = 0; i < length; i++)
 				player_board[starting_point.y + i][starting_point.x] = escribe;
+			printf("Ship successfully placed.\n");
 			break;
 		case 'w':
 		case 'W':
 			for (int i = 0; i < length; i++)
 				player_board[starting_point.y][starting_point.x - i] = escribe;
+			printf("Ship successfully placed.\n");
 			break;
 		default:
 			break;
@@ -336,7 +318,35 @@ bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char d
 		break;
 	}
 
-	if (!available)
-		printf("Not enough space on board to place ship there.\n");
+	//if (!available)
+	//	printf("Not enough space on board to place ship there.\n");
 	return available;
+}
+void display_player_board(char player_board[][MAX_COL])
+{
+	printf("Player Board\n");
+	printf("   0 1 2 3 4 5 6 7 8 9 \n");
+	for (int i = 0; i < MAX_ROWS; i++) {
+		printf(" %d ", i);
+		for (int j = 0; j < MAX_COL; j++) {
+			printf("%c ", player_board[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+void display_pc_board(char pc_board[][MAX_COL])
+{
+	printf("PC Board\n");
+	printf("   0 1 2 3 4 5 6 7 8 9 \n");
+	for (int i = 0; i < MAX_ROWS; i++) {
+		printf(" %d ", i);
+		for (int j = 0; j < MAX_COL; j++) {
+			if (pc_board[i][j] == 'x' || pc_board[i][j] == 'o' || pc_board[i][j] == '~')
+				printf("%c ", pc_board[i][j]);
+			else
+				printf("~ ");
+		}
+		printf("\n");
+	}
 }

@@ -62,14 +62,13 @@ int main(void) {
 	display_menu();
 	ship_placement = choose_ship_placement();
 	if (ship_placement == 1) {
-		display_board(player_board, pc_board);
 		ship_placement_manual(player_board);
 	}
 	else if (ship_placement == 2) {
 		ship_placement_auto();
-		display_board(player_board, pc_board);
+		display_boards(player_board, pc_board);
 	}
-	display_board(player_board, pc_board);
+	//display_boards(player_board, pc_board);
 
 	return 0;
 }
