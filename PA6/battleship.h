@@ -15,6 +15,10 @@
 #define CRUISER 3
 #define SUBMARINE 3
 #define DESTROYER 2
+#define NORTH 0
+#define EAST 1
+#define SOUTH 2
+#define WEST 3
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,26 +29,12 @@ typedef struct coordinate {
 	int x;
 	int y;
 }Coordinate;
-typedef struct carrier {
-	Coordinate position[5];
+typedef struct stats {
 	int hits;
-}Carrier;
-typedef struct battleship {
-	Coordinate position[4];
-	int hits;
-}Battleship;
-typedef struct cruiser {
-	Coordinate position[3];
-	int hits;
-}Cruiser;
-typedef struct submarine {
-	Coordinate position[3];
-	int hits;
-}Submarine;
-typedef struct destroyer {
-	Coordinate position[2];
-	int hits;
-}Destroyer;
+	int misses;
+	int shots;
+	double ratio;
+}Stats;
 
 void display_menu(void);
 void rules(void);
@@ -53,8 +43,9 @@ void display_boards(char player_board[][MAX_COL], char pc_board[][MAX_COL]);
 int choose_ship_placement(void);
 bool check_space(char player_board[][MAX_COL], Coordinate location);
 void ship_placement_manual(char player_board[][MAX_COL]);
-void ship_placement_auto();
-void ship_locator(char player_board[][MAX_COL], Carrier carrier1, Battleship battleship1, Cruiser cruiser1, Submarine sub1, Destroyer destroyer1);
+void ship_placement_auto(char player_board[][MAX_COL]);
 bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char direction, int length);
 void display_player_board(char player_board[][MAX_COL]);
 void display_pc_board(char pc_board[][MAX_COL]);
+int direction_gen(void);
+Coordinate rand_shot(void);

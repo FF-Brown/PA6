@@ -242,31 +242,91 @@ void ship_placement_manual(char player_board[][MAX_COL])
 			break;
 		}
 	}
+	printf("Your ships have been successfully placed in the following arrangement:\n");
+	display_player_board(player_board);
 }
 /*
 	Function: ship_placement_auto()
 	Date Created: 10/26/2019
-	Description: Allows for random placement of ships. Proposed functionality: Generates coordinate pair and checks if available. This is starting point for ship. Generates new coordinate pair. X value is horizontal/vertical (value of -1 or 1). Y value is direction of plotting (1 or -1). If x is -1 (for example), adds y value to x coordinate of starting point. If x is 1, instead adds quantum number y (q_y) to y value of starting point (SP). Checks if that space is available. If not, toggle q_y (multiply by -1) and check again. If available, adds coordinate there and uses as new evaluation point (EP). If space check fails after q_y toggle, then toggle q_x. Check, toggle q_y if necessary. After 4 total failures, generate new SP. If 2+ spaces have been filled (including SP) and checks fail, try building from SP with toggled q_y.
-
-		May get simplified to just find a new SP if any of its coordinates fail to be placed
-
+	Description: GREATLY SIMPLIFIED VERSION: Structure resembling that of ship_placement_manual(). Generates random starting values, checks to see if there's space to place ship. If not, tries again. If so, places ship. Loops for all 5 ships, adjusting ship length and corresponding letter each iteration. Reports successful when it reaches the end.
 	Preconditions: Player chooses auto placement OR computer is placing ships. Also a high tolerance for complicated-ass logic.
 	Postconditions: Ships placed on board
 */
-void ship_placement_auto()
+void ship_placement_auto(char player_board[][MAX_COL])
 {
-	printf("Your ships have been placed at random and now occupy the following spaces:\n");
-}
-/*
-	Function: ship_locator()
-	Date Created: 10/27/2019
-	Description: Iterates through a board to locate ships and place their coordinates in the correct struct
-	Preconditions: Ships placed on board
-	Postconditions: Structs assigned correct coordinates for ships
-*/
-void ship_locator(char player_board[][MAX_COL], Carrier carrier1, Battleship battleship1, Cruiser cruiser1, Submarine sub1, Destroyer destroyer1)
-{
+	int direction = 0;
+	int length = 0;
+	char escribe = '\0';
+	bool space = false;
+	char dir_char = '\0';
+	Coordinate starting_point = { 0, 0 };
 
+	for (int i = 0; i < 5; i++) {
+		do {
+			//Generate random values for starting coordinates and direction
+			direction = direction_gen();
+			starting_point = rand_shot();
+
+			//Set ship length and letter
+			switch (i) {
+			case 0:
+				length = CARRIER;
+				escribe = 'k';
+				break;
+			case 1:
+				length = BATTLESHIP;
+				escribe = 'b';
+				break;
+			case 2:
+				length = CRUISER;
+				escribe = 'c';
+				break;
+			case 3:
+				length = SUBMARINE;
+				escribe = 's';
+				break;
+			case 4:
+				length = DESTROYER;
+				escribe = 'd';
+				break;
+			default:
+				break;
+			}
+			//Temporarily convert direction to a character
+			if (direction == 0) dir_char = 'n';
+			else if (direction == 1) dir_char = 'e';
+			else if (direction == 2) dir_char = 's';
+			else dir_char = 'w';
+			//Check available space according to direction
+			space = ship_spacer(player_board, starting_point, dir_char, length);
+			//Restart process if not enough space available
+		} while (!space);
+		//Otherwise, build boat 
+		switch (direction)
+		{
+		case NORTH:
+			for (int j = 0; j < length; j++)
+				player_board[starting_point.y - j][starting_point.x] = escribe;
+			break;
+		case EAST:
+			for (int j = 0; j < length; j++)
+				player_board[starting_point.y][starting_point.x + j] = escribe;
+			break;
+		case SOUTH:
+			for (int j = 0; j < length; j++)
+				player_board[starting_point.y + j][starting_point.x] = escribe;
+			break;
+		case WEST:
+			for (int j = 0; j < length; j++)
+				player_board[starting_point.y][starting_point.x - j] = escribe;
+			break;
+		default:
+			break;
+		}
+		//Loop for other boats
+	}
+	//Report successful
+	printf("Ships successfully placed.\n");
 }
 /*
 	Function: ship_spacer()
@@ -322,6 +382,13 @@ bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char d
 	//	printf("Not enough space on board to place ship there.\n");
 	return available;
 }
+/*
+	Function: display_player_board()
+	Date Created: 10/27/2019
+	Description: Displays only the player's board
+	Preconditions: Boards initialized
+	Postconditions: Board displayed
+*/
 void display_player_board(char player_board[][MAX_COL])
 {
 	printf("Player Board\n");
@@ -335,6 +402,13 @@ void display_player_board(char player_board[][MAX_COL])
 	}
 	printf("\n");
 }
+/*
+	Function: display_pc_board()
+	Date Created: 10/27/2019
+	Description: Displays only the computer's board
+	Preconditions: Boards initialized
+	Postconditions: Board displayed
+*/
 void display_pc_board(char pc_board[][MAX_COL])
 {
 	printf("PC Board\n");
@@ -349,4 +423,24 @@ void display_pc_board(char pc_board[][MAX_COL])
 		}
 		printf("\n");
 	}
+}
+/*
+	Function: quantum_numbers()
+	Date Created: 10/27/2019
+	Description: Generates a coordinate pair with values of either 1 or -1 for use in automatic ship placement
+	Preconditions: None
+	Postconditions: Pair of quantum numbers returned
+*/
+int direction_gen(void)
+{
+	int direction = 0;
+	direction = rand() % 4;
+	return direction;
+}
+Coordinate rand_shot(void) 
+{
+	Coordinate shot = { 0, 0 };
+	shot.x = rand() % 10;
+	shot.y = rand() % 10;
+	return shot;
 }
