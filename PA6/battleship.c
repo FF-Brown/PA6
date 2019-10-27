@@ -66,6 +66,13 @@ void rules(void)
 	printf("When all the coordinates corresponding to one ship have been hit, the owner of the ship must tell their opponent that they have sunk a ship.\n");
 	printf("The game ends when all ships belonging to one player have been sunk.\n");
 }
+/*
+	Function: initialize_board()
+	Date Created: 10/27/2019
+	Description: Sets all elements of one board to ~
+	Preconditions: None
+	Postconditions: Board initialized properly
+*/
 void initialize_board(char player_board[][MAX_COL], int rows, int columns)
 {
 	for (int i = 0; i < rows; i++) {
@@ -74,6 +81,13 @@ void initialize_board(char player_board[][MAX_COL], int rows, int columns)
 		}
 	}
 }
+/*
+	Function: display_board()
+	Date Created: 10/27/2019
+	Description: Displays both player and computer boards. Does not display computer ships (that would be cheating lol)
+	Preconditions: None
+	Postconditions: Boards displayed for further use
+*/
 void display_board(char player_board[][MAX_COL], char pc_board[][MAX_COL])
 {
 	int current_element = 0;
@@ -122,17 +136,130 @@ int choose_ship_placement(void)
 	return option;
 }
 /*
+	Function: check_space()
+	Date Created: 10/27/2019
+	Description: Takes a board and a coordinate. Checks whether the board is empty (~) in that space. 
+	Preconditions: Boards initialized
+	Postconditions: T/F returned, message on screen if error
+*/
+bool check_space(char player_board[][MAX_COL], Coordinate location)
+{
+	bool available = false;
+	//Check that coordinate is within bounds of board
+	if (location.x < 0 || location.x > 9) {
+		printf("Error: x-coordinate out of range.\n");
+		available = false;
+	}
+	else if (location.y < 0 || location.y > 0) {
+		printf("Error: y-coordinate out of range.\n");
+		available = false; 
+	}
+
+	//Check that space is available
+	else if (player_board[location.y][location.x] == '~')
+		available = true;
+	else {
+		available = false;
+		printf("According to the Pauli Exclusion Principle, two identical fermions cannot occupy the same quantum state. Simply put, two pieces of matter cannot exist in the same place at the same time. That includes boats.\n");
+	}
+	return available;
+}
+/*
 	Function: ship_placement_manual()
 	Date Created: 10/26/2019
 	Description: Allows user to input coordinates for each ship. Saves coordinates in struct arrays.
 	Preconditions: choose_ship_placement() called
 	Postconditions: Ships placed on board
 */
-void ship_placement_manual()
+void ship_placement_manual(char player_board[][MAX_COL])
 {
-	printf("You may now choose where you would like to place your ships.\n");
-	//display_board()
-	//printf("")
+	char direction = '\0';
+	char names[5][15] = { "carrier", "battleship", "cruiser", "submarine", "destroyer" };
+	int length = 0;
+	Coordinate starting_point = { 0,0 };
+	char escribe = '\0';
+	bool available = false;
+	bool space = false;
+	
+	//Take input for each ship individually
+	for(int i = 0; i < 5; i++){
+		do {
+			//Input starting coordinate
+			printf("First coordinate for %s: ", names[i]);
+			scanf("%d%d", &starting_point.x, &starting_point.y);
+			//Check bounds of board (0-9)
+			if (starting_point.x < 0 || starting_point.x > 9 || starting_point.y < 0 || starting_point.y > 9) {
+				printf("Here be dragons!! You've fallen off the edge of the world. Try again.\n");
+			}
+			//Check to see if the square is open
+			else {
+				available = check_space(player_board, starting_point);
+			}
+		} while (starting_point.x < 0 || starting_point.x > 9 || starting_point.y < 0 || starting_point.y > 9 || !available);
+		//Set length of ship and which letter to write on board for that ship
+		switch (i){
+		case 0:
+			length = CARRIER;
+			escribe = 'k';
+			break;
+		case 1:
+			length = BATTLESHIP;
+			escribe = 'b';
+			break;
+		case 2:
+			length = CRUISER;
+			escribe = 'c';
+			break;
+		case 3:
+			length = SUBMARINE;
+			escribe = 's';
+			break;
+		case 4:
+			length = DESTROYER;
+			escribe = 'd';
+			break;
+		default:
+			break;
+		}
+
+		//User chooses which direction to place their boat from the starting point
+		do{
+			printf("Direction (N/E/S/W): ");
+			scanf(" %c", &direction);
+			if (direction != 'N' && direction != 'n' && direction != 'E' && direction != 'e' && direction != 'S' && direction != 's' && direction != 'W' && direction != 'w')
+				printf("That's not even one of the options, bud.\n");
+			else
+				space = ship_spacer(player_board, starting_point, direction, length);
+			//Loop if invalid input or not enough space
+		} while (direction != 'N' && direction != 'n' && direction != 'E' && direction != 'e' && direction != 'S' && direction != 's' && direction != 'W' && direction != 'w' && !space);
+		
+		//Builds boat in the direction chosen
+		switch (direction)
+		{
+		case 'n':
+		case 'N':
+			for (int i = 0; i < length; i++)
+				player_board[starting_point.y - i][starting_point.x] = escribe;
+			break;
+		case 'e':
+		case 'E':
+			for (int i = 0; i < length; i++)
+				player_board[starting_point.y][starting_point.x + i] = escribe;
+			break;
+		case 's':
+		case 'S':
+			for (int i = 0; i < length; i++)
+				player_board[starting_point.y + i][starting_point.x] = escribe;
+			break;
+		case 'w':
+		case 'W':
+			for (int i = 0; i < length; i++)
+				player_board[starting_point.y][starting_point.x - i] = escribe;
+			break;
+		default:
+			break;
+		}
+	}
 }
 /*
 	Function: ship_placement_auto()
@@ -147,4 +274,69 @@ void ship_placement_manual()
 void ship_placement_auto()
 {
 	printf("Your ships have been placed at random and now occupy the following spaces:\n");
+}
+/*
+	Function: ship_locator()
+	Date Created: 10/27/2019
+	Description: Iterates through a board to locate ships and place their coordinates in the correct struct
+	Preconditions: Ships placed on board
+	Postconditions: Structs assigned correct coordinates for ships
+*/
+void ship_locator(char player_board[][MAX_COL], Carrier carrier1, Battleship battleship1, Cruiser cruiser1, Submarine sub1, Destroyer destroyer1)
+{
+
+}
+/*
+	Function: ship_spacer()
+	Date Created: 10/27/2019
+	Description: Checks to see if there is enough space in a row/column to place a ship based on starting coordinate, direction, and length
+	Preconditions: Starting coordinate for ship chosen as well as direction, length determined
+	Postconditions: T/F returned
+*/
+bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char direction, int length)
+{
+	bool available = true;
+	Coordinate checkpoint = { 0, 0 };
+
+	switch (direction)
+	{
+	case 'n':
+	case 'N':
+		for (int i = 0; i < length && available; i++) {
+			checkpoint.y = starting_point.y - i;
+			checkpoint.x = starting_point.x;
+			available = check_space(player_board, checkpoint);
+		}
+		break;
+	case 'e':
+	case 'E':
+		for (int i = 0; i < length && available; i++) {
+			checkpoint.y = starting_point.y;
+			checkpoint.x = starting_point.x + i;
+			available = check_space(player_board, checkpoint);
+		}
+		break;
+	case 's':
+	case 'S':
+		for (int i = 0; i < length && available; i++){
+			checkpoint.y = starting_point.y + i;
+			checkpoint.x = starting_point.x;
+			available = check_space(player_board, checkpoint);
+		}
+		break;
+	case 'w':
+	case 'W':
+		for (int i = 0; i < length && available; i++) {
+			checkpoint.y = starting_point.y;
+			checkpoint.x = starting_point.x - i;
+			available = check_space(player_board, checkpoint);
+		}
+		break;
+	default:
+		break;
+	}
+
+	if (!available)
+		printf("Not enough space on board to place ship there.\n");
+	return available;
 }
