@@ -302,8 +302,7 @@ void ship_placement_auto(char player_board[][MAX_COL])
 			//Restart process if not enough space available
 		} while (!space);
 		//Otherwise, build boat 
-		switch (direction)
-		{
+		switch (direction){
 		case NORTH:
 			for (int j = 0; j < length; j++)
 				player_board[starting_point.y - j][starting_point.x] = escribe;
@@ -340,8 +339,7 @@ bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char d
 	bool available = true;
 	Coordinate checkpoint = { 0, 0 };
 
-	switch (direction)
-	{
+	switch (direction){
 	case 'n':
 	case 'N':
 		for (int i = 0; i < length && available; i++) {
@@ -349,6 +347,7 @@ bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char d
 			checkpoint.x = starting_point.x;
 			available = check_space(player_board, checkpoint);
 		}
+		display_player_board(player_board);
 		break;
 	case 'e':
 	case 'E':
@@ -357,6 +356,7 @@ bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char d
 			checkpoint.x = starting_point.x + i;
 			available = check_space(player_board, checkpoint);
 		}
+		display_player_board(player_board);
 		break;
 	case 's':
 	case 'S':
@@ -365,6 +365,7 @@ bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char d
 			checkpoint.x = starting_point.x;
 			available = check_space(player_board, checkpoint);
 		}
+		display_player_board(player_board);
 		break;
 	case 'w':
 	case 'W':
@@ -373,13 +374,11 @@ bool ship_spacer(char player_board[][MAX_COL], Coordinate starting_point, char d
 			checkpoint.x = starting_point.x - i;
 			available = check_space(player_board, checkpoint);
 		}
+		display_player_board(player_board);
 		break;
 	default:
 		break;
 	}
-
-	//if (!available)
-	//	printf("Not enough space on board to place ship there.\n");
 	return available;
 }
 /*
@@ -405,7 +404,7 @@ void display_player_board(char player_board[][MAX_COL])
 /*
 	Function: display_pc_board()
 	Date Created: 10/27/2019
-	Description: Displays only the computer's board
+	Description: Displays only the computer's board. Shows only water and previous shots. Hides ships.
 	Preconditions: Boards initialized
 	Postconditions: Board displayed
 */
@@ -425,11 +424,11 @@ void display_pc_board(char pc_board[][MAX_COL])
 	}
 }
 /*
-	Function: quantum_numbers()
+	Function: direction_gen()
 	Date Created: 10/27/2019
-	Description: Generates a coordinate pair with values of either 1 or -1 for use in automatic ship placement
+	Description: Generates a value 0-3 for use in automatic ship placement
 	Preconditions: None
-	Postconditions: Pair of quantum numbers returned
+	Postconditions: Direction returned
 */
 int direction_gen(void)
 {
@@ -437,10 +436,145 @@ int direction_gen(void)
 	direction = rand() % 4;
 	return direction;
 }
+/*
+	Function: rand_shot()
+	Date Created: 10/27/2019
+	Description: Generates random coordinates for the computer to target. 
+	Preconditions: None
+	Postconditions: Returns coordinate pair
+*/
 Coordinate rand_shot(void) 
 {
 	Coordinate shot = { 0, 0 };
 	shot.x = rand() % 10;
 	shot.y = rand() % 10;
 	return shot;
+}
+/*
+	Function: turn_order()
+	Date Created: 10/27/2019
+	Description: Generates 0 or 1 to determine which player goes first
+	Preconditions: Pre-game steps taken (boards initialized, pieces set)
+	Postconditions: First player returned
+*/
+int turn_order(void)
+{
+	int first_player = 0;
+	first_player = rand() % 2;
+	return first_player;
+}
+/*
+	Function: get_current_player()
+	Date Created: 10/27/2019
+	Description: Takes turn number and decides whether the user (P1) or the pc (P2) should be taking a turn. This works because the turn number does not always start at the same number. The starting value is what determines who goes first.
+	Preconditions: Pre-game section completed, turn number accurate
+	Postconditions: Current player returned
+*/
+int get_current_player(int turn)
+{
+	int current_player = 1;
+	if (turn % 2 == 0) current_player = 2;
+	return current_player;
+}
+/*
+	Function: get_target()
+	Date Created: 10/27/2019
+	Description: Prompts for target coordinates from user
+	Preconditions: None
+	Postconditions: Coordinate pair returned
+*/
+Coordinate get_target(void)
+{
+	Coordinate target = { 0, 0 };
+	do {
+		printf("Enter coordinates of target: ");
+		scanf("%d%d", &target.x, &target.y);
+		if (target.x < 0 || target.x > MAX_COL - 1 || target.y < 0 || target.y > MAX_ROWS - 1)
+			printf("That's not even on the board, bro.\n");
+	} while (target.x < 0 || target.x > MAX_COL -1 || target.y < 0 || target.y > MAX_ROWS - 1);
+	return target;
+}
+/*
+	Function: target_check()
+	Date Created: 10/27/2019
+	Description: Takes target and either board and determines result of shot.
+	Preconditions: Player/PC has chosen a target
+	Postconditions: Returns 'o' for miss, 'x' for hit, and 'f' if target previously used
+*/
+char target_check(Coordinate target, char board[][MAX_COL])
+{
+	char result = '\0';
+	if (board[target.y][target.x] == '~')
+		result = 'o';
+	else if (board[target.y][target.x] == 'x' || board[target.y][target.x] == 'o')
+		result = 'f';
+	else
+		result = 'x';
+	return result;
+}
+/*
+	Function: update_ship_health()
+	Date Created: 10/27/2019
+	Description: Takes target, player info, and enemy board. Determines which ship was hit and decreases its health.
+	Preconditions: Player/PC has selected a target and it is a hit. Coordinate has not yet been changed to 'x'.
+	Postconditions: Ship health updated. Coordinate changed to 'x'.
+*/
+void update_ship_health(char enemy_board[][MAX_COL], Coordinate target, int ship_health[][5], int current_player)
+{
+	int i = 0;
+	if (current_player == 1) i = 1;
+	else if (current_player == 2) i = 0; //This line is unnecessary, but helpful for readability
+	switch (enemy_board[target.y][target.x]) { 
+	case 'k':
+		ship_health[i][0]--;  
+	case 'b':
+		ship_health[i][1]--;  
+	case 'c':
+		ship_health[i][2]--;  
+	case 's':
+		ship_health[i][3]--;  
+	case 'd':
+		ship_health[i][4]--; 
+	default:
+		break;
+	}
+	enemy_board[target.y][target.x] = 'x'; 
+}
+/*
+	Function: targeting_sequence()
+	Date Created: 10/27/2019
+	Description: Gets target (x,y) from current player. Checks that coordinate on enemy board. Updates square on board with result. 
+	Preconditions: Boards initialized, pieces set, current player determined
+	Postconditions: Updates coordinate on board and prints results
+*/
+void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int current_player)
+{
+	Coordinate target = { 0, 0 };
+	char result = '\0';
+	bool available = false;
+
+	do {
+		if (current_player == 1)
+			target = get_target(); //Player input
+		else if (current_player == 2)
+			target = rand_shot(); //PC auto target
+
+		result = target_check(target, enemy_board);
+		//Miss
+		if (result == 'o') {
+			enemy_board[target.y][target.x] = result; 
+			available = true;
+		}
+		//Hit
+		else if (result == 'x') {
+			update_ship_health(enemy_board, target, ship_health, current_player);
+			available = true;
+		}
+		else {//They've already used this target
+			if(current_player == 1)
+				printf("You've already used this target.\n"); 
+			available = false;
+		}
+	} while (!available);
+
 }
