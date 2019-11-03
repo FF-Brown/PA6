@@ -137,17 +137,68 @@ void display_player_board(char player_board[][MAX_COL]);
 */
 void display_pc_board(char pc_board[][MAX_COL]);
 /*
-	Function: quantum_numbers()
+	Function: direction_gen()
 	Date Created: 10/27/2019
-	Description: Generates a coordinate pair with values of either 1 or -1 for use in automatic ship placement
+	Description: Generates a value 0-3 for use in automatic ship placement
 	Preconditions: None
-	Postconditions: Pair of quantum numbers returned
+	Postconditions: Direction returned
 */
 int direction_gen(void);
+/*
+	Function: rand_shot()
+	Date Created: 10/27/2019
+	Description: Generates random coordinates for the computer to target.
+	Preconditions: None
+	Postconditions: Returns coordinate pair
+*/
 Coordinate rand_shot(void);
+/*
+	Function: turn_order()
+	Date Created: 10/27/2019
+	Description: Generates 0 or 1 to determine which player goes first
+	Preconditions: Pre-game steps taken (boards initialized, pieces set)
+	Postconditions: First player returned
+*/
 int turn_order(void);
+/*
+	Function: get_current_player()
+	Date Created: 10/27/2019
+	Description: Takes turn number and decides whether the user (P1) or the pc (P2) should be taking a turn. This works because the turn number does not always start at the same number. The starting value is what determines who goes first.
+	Preconditions: Pre-game section completed, turn number accurate
+	Postconditions: Current player returned
+*/
 int get_current_player(int turn);
+/*
+	Function: get_target()
+	Date Created: 10/27/2019
+	Description: Prompts for target coordinates from user
+	Preconditions: None
+	Postconditions: Coordinate pair returned
+*/
 Coordinate get_target(void);
+/*
+	Function: target_check()
+	Date Created: 10/27/2019
+	Description: Takes target and either board and determines result of shot.
+	Preconditions: Player/PC has chosen a target
+	Postconditions: Returns 'o' for miss, 'x' for hit, and 'f' if target previously used
+*/
 char target_check(Coordinate target, char board[][MAX_COL]);
+/*
+	Function: update_ship_health()
+	Date Created: 10/27/2019
+	Description: Takes target, player info, and enemy board. Determines which ship was hit and decreases its health.
+	Preconditions: Player/PC has selected a target and it is a hit. Coordinate has not yet been changed to 'x'.
+	Postconditions: Ship health updated. Coordinate changed to 'x'.
+*/
 void update_ship_health(char enemy_board[][MAX_COL], Coordinate target, int ship_health[][5], int current_player);
-void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int current_player);
+/*
+	Function: targeting_sequence()
+	Date Created: 10/27/2019
+	Description: Gets target (x,y) from current player. Checks that coordinate on enemy board. Updates square on board with result.
+	Preconditions: Boards initialized, pieces set, current player determined
+	Postconditions: Updates coordinate on board and prints results
+*/
+void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int current_player, Stats* stats);
+bool win_condition(int current_player, int ship_health[][5]);
+void log_data(int current_player, Coordinate target, char result, bool sunk, char ship[]);

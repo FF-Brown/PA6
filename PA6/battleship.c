@@ -527,14 +527,34 @@ void update_ship_health(char enemy_board[][MAX_COL], Coordinate target, int ship
 	switch (enemy_board[target.y][target.x]) { 
 	case 'k':
 		ship_health[i][0]--;  
+		if (ship_health[i][0] == 0) {
+			printf("Player %d sunk a carrier!\n", current_player);
+		}
+		break;
 	case 'b':
 		ship_health[i][1]--;  
+		if (ship_health[i][1] == 0) {
+			printf("Player %d sunk a battleship!\n", current_player);
+		}
+		break;
 	case 'c':
 		ship_health[i][2]--;  
+		if (ship_health[i][2] == 0) {
+			printf("Player %d sunk a cruiser!\n", current_player);
+		}
+		break;
 	case 's':
 		ship_health[i][3]--;  
+		if (ship_health[i][3] == 0) {
+			printf("Player %d sunk a submarine!\n", current_player);
+		}
+		break;
 	case 'd':
 		ship_health[i][4]--; 
+		if (ship_health[i][4] == 0) {
+			printf("Player %d sunk a destroyer!\n", current_player);
+		}
+		break;
 	default:
 		break;
 	}
@@ -547,27 +567,39 @@ void update_ship_health(char enemy_board[][MAX_COL], Coordinate target, int ship
 	Preconditions: Boards initialized, pieces set, current player determined
 	Postconditions: Updates coordinate on board and prints results
 */
-void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int current_player)
+void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int current_player, Stats* stats)
 {
 	Coordinate target = { 0, 0 };
 	char result = '\0';
-	bool available = false;
+	bool available = false, sunk = false;
+	char hit_ship_name = '\0';
+	char sunk_ship[15];
 
 	do {
 		if (current_player == 1)
 			target = get_target(); //Player input
 		else if (current_player == 2)
 			target = rand_shot(); //PC auto target
-
+		printf("Targeting (%d,%d)...\n\n", target.x, target.y);
 		result = target_check(target, enemy_board);
 		//Miss
 		if (result == 'o') {
+			printf("Miss!\n");
 			enemy_board[target.y][target.x] = result; 
+			//Add a miss to stats
+			stats->misses++;
+			//log in file~~~~~~~~~~~~~~~~~~~~~~~~~
 			available = true;
 		}
 		//Hit
 		else if (result == 'x') {
+			printf("Hit!\n");
+			//Add a hit to stats
+			stats->hits++;
+			//log in file~~~~~~~~~~~~~~~~~~~~~~~~~
+			hit_ship_name = enemy_board[target.y][target.x];
 			update_ship_health(enemy_board, target, ship_health, current_player);
+
 			available = true;
 		}
 		else {//They've already used this target
@@ -576,5 +608,26 @@ void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int c
 			available = false;
 		}
 	} while (!available);
+}
+/*
+	Function: win_condition()
+	Date Created: 11/2/2019
+	Description: Checks if a player's ships have all sunk. Meant to indicate if the current player has won by checking the opposing player's ships. 
+	Preconditions: None
+	Postconditions: Returns true/false
+*/
+bool win_condition(int current_player, int ship_health[][5])
+{
+	int sum = 0;
+	bool has_won = false;
+	for (int i = 0; i < 5; i++) {
+		sum += ship_health[current_player % 2][i];
+	}
+	if (sum == 0)
+		has_won = true;
+	return has_won;
+}
+void log_data(int current_player, Coordinate target, char result, bool sunk, char ship[])
+{
 
 }

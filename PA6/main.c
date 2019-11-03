@@ -19,10 +19,10 @@ int main(void) {
 	};
 	int turn = 0, current_player = 0;
 	Coordinate target = { 0, 0 };
-	Stats stats1 = { 0 };
-	Stats stats2 = { 0 };
+	Stats stats1 = { 0, 0, 0, 0.0 };
+	Stats stats2 = { 0, 0, 0, 0.0 };
 	char result = '\0';
-	bool available = false;
+	bool available = false, has_won = false;
 
 	//Initialize arrays
 	initialize_board(player_board, MAX_ROWS, MAX_COL);
@@ -52,12 +52,40 @@ int main(void) {
 	//Determine first player
 	turn = turn_order();
 	current_player = get_current_player(turn);
+	system("cls");
 	printf("Player %d will go first.\n", current_player);
 
-	//Player turn
-	targeting_sequence(pc_board, ship_health, current_player);
-	//PC turn
-	targeting_sequence(player_board, ship_health, current_player);
+	//Loop for turn sequence
+	do{
+		current_player = get_current_player(turn);
+		if (current_player == 1) { //Player turn
+			printf("Player 1 turn.\n");
+			system("pause");
+			system("cls");
+			display_boards(player_board, pc_board);
+			targeting_sequence(pc_board, ship_health, current_player, &stats1);
+			system("pause");
+			system("cls");
+		}
+		else { //PC turn
+			printf("Player 2 turn.\n");
+			targeting_sequence(player_board, ship_health, current_player, &stats2);
+		}
+		has_won = win_condition(current_player, ship_health);
+		turn++;
+	} while (!has_won);
+
+	//After someone wins
+	if (current_player == 1) { //Congratulate player
+		printf("Congratulations! You win!!\n");
+	}
+	else { //Hate on player
+		printf("You lose! Sucks to suck!\n");
+	}
+
+	//Save data
+
+	printf("Data successfully saved to file.\n");
 
 	return 0;
 }
