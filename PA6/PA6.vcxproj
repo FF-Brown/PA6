@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\MyFiles\comment_block.txt" />
+    <Text Include="battleship.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

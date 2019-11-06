@@ -529,30 +529,35 @@ void update_ship_health(char enemy_board[][MAX_COL], Coordinate target, int ship
 		ship_health[i][0]--;  
 		if (ship_health[i][0] == 0) {
 			printf("Player %d sunk a carrier!\n", current_player);
+			log_sunk_ship(current_player, "carrier");
 		}
 		break;
 	case 'b':
 		ship_health[i][1]--;  
 		if (ship_health[i][1] == 0) {
 			printf("Player %d sunk a battleship!\n", current_player);
+			log_sunk_ship(current_player, "battleship");
 		}
 		break;
 	case 'c':
 		ship_health[i][2]--;  
 		if (ship_health[i][2] == 0) {
 			printf("Player %d sunk a cruiser!\n", current_player);
+			log_sunk_ship(current_player, "cruiser");
 		}
 		break;
 	case 's':
 		ship_health[i][3]--;  
 		if (ship_health[i][3] == 0) {
 			printf("Player %d sunk a submarine!\n", current_player);
+			log_sunk_ship(current_player, "submarine");
 		}
 		break;
 	case 'd':
 		ship_health[i][4]--; 
 		if (ship_health[i][4] == 0) {
 			printf("Player %d sunk a destroyer!\n", current_player);
+			log_sunk_ship(current_player, "destroyer");
 		}
 		break;
 	default:
@@ -588,7 +593,8 @@ void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int c
 			enemy_board[target.y][target.x] = result; 
 			//Add a miss to stats
 			stats->misses++;
-			//log in file~~~~~~~~~~~~~~~~~~~~~~~~~
+			//Log in file
+			log_current_move(current_player, target, result);
 			available = true;
 		}
 		//Hit
@@ -596,7 +602,8 @@ void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int c
 			printf("Hit!\n");
 			//Add a hit to stats
 			stats->hits++;
-			//log in file~~~~~~~~~~~~~~~~~~~~~~~~~
+			//Log result in file. If ship was sunk, logged by update_ship_health()
+			log_current_move(current_player, target, result);
 			hit_ship_name = enemy_board[target.y][target.x];
 			update_ship_health(enemy_board, target, ship_health, current_player);
 
@@ -627,7 +634,62 @@ bool win_condition(int current_player, int ship_health[][5])
 		has_won = true;
 	return has_won;
 }
-void log_data(int current_player, Coordinate target, char result, bool sunk, char ship[])
+void log_current_move(int current_player, Coordinate target, char result)
 {
+	FILE* outfile = NULL;
+	outfile = fopen("battleship.log", "a");
+	if (result == 'x')
+		fprintf(outfile, "Player %d fired on (%d,%d). Hit!\n", current_player, target.x, target.y);
+	else
+		fprintf(outfile, "Player %d fired on (%d,%d). Miss!\n", current_player, target.x, target.y);
+	fclose(outfile);
+}
+void log_sunk_ship(int current_player, char ship_name[])
+{
+	FILE* outfile = NULL;
+	outfile = fopen("battleship.log", "a");
+	fprintf(outfile, "Player %d sunk a %s!", current_player, ship_name);
+	fclose(outfile);
+}
+void init_logfile(void)
+{
+	//struct to hold time
+	time_t t;
 
+	//get current system time
+	time(&t);
+
+	//Open file to overwrite contents and print timestamp
+	FILE* outfile = NULL;
+	outfile = fopen("battleship.log", "w");
+	fprintf(outfile, "Battleship Game Log \n%s\n", ctime(&t));
+	fclose(outfile);
+}
+void log_player_stats(Stats stats1, Stats stats2)
+{
+	//Dummy values for testing
+	stats1.hits = 5;
+	stats1.misses = 11;
+	stats2.hits = 10;
+	stats2.misses = 31;
+
+	stats1.shots = stats1.hits + stats1.misses;
+	stats2.shots = stats2.hits + stats2.misses;
+	stats1.ratio = 100 * (double)stats1.hits / (double)stats1.misses;
+	stats2.ratio = 100 * (double)stats2.hits / (double)stats2.misses;
+	FILE* outfile = NULL;
+	outfile = fopen("battleship.log", "a");
+	//Player 1 stats print
+	fprintf(outfile, "\nPlayer 1 Stats\n");
+	fprintf(outfile, "# Hits: %d\n", stats1.hits);
+	fprintf(outfile, "# Misses: %d\n", stats1.misses);
+	fprintf(outfile, "Total Shots: %d\n", stats1.shots);
+	fprintf(outfile, "Hit-Miss Ratio: %.0lf%%\n", stats1.ratio);
+	//Player 2 stats print
+	fprintf(outfile, "\nPlayer 2 Stats\n");
+	fprintf(outfile, "# Hits: %d\n", stats2.hits);
+	fprintf(outfile, "# Misses: %d\n", stats2.misses);
+	fprintf(outfile, "Total Shots: %d\n", stats2.shots);
+	fprintf(outfile, "Hit-Miss Ratio: %.0lf%%\n", stats2.ratio);
+	fclose(outfile);
 }

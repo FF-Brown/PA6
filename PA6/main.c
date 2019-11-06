@@ -21,12 +21,14 @@ int main(void) {
 	Coordinate target = { 0, 0 };
 	Stats stats1 = { 0, 0, 0, 0.0 };
 	Stats stats2 = { 0, 0, 0, 0.0 };
+	Stats stats_tot[2] = { {0,0,0,0.0},{0,0,0,0.0} };
 	char result = '\0';
 	bool available = false, has_won = false;
 
-	//Initialize arrays
+	//Initialize things
 	initialize_board(player_board, MAX_ROWS, MAX_COL);
 	initialize_board(pc_board, MAX_ROWS, MAX_COL);
+	init_logfile();
 
 	//Menu
 	display_menu();
@@ -84,7 +86,7 @@ int main(void) {
 	}
 
 	//Save data
-
+	log_player_stats(stats1, stats2);
 	printf("Data successfully saved to file.\n");
 
 	return 0;

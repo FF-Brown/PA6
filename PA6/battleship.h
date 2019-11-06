@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#include <dos.h>
 
 /*
 	Struct: Coordinate
@@ -47,6 +48,16 @@ typedef struct stats {
 	int shots;
 	double ratio;
 }Stats;
+/*
+	int da_day;
+	int da_mon;
+	int da_year;
+*/
+typedef struct date {
+	int da_day;
+	int da_mon;
+	int da_year;
+}Date;
 
 /*
 	Function: display_menu()
@@ -201,4 +212,7 @@ void update_ship_health(char enemy_board[][MAX_COL], Coordinate target, int ship
 */
 void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int current_player, Stats* stats);
 bool win_condition(int current_player, int ship_health[][5]);
-void log_data(int current_player, Coordinate target, char result, bool sunk, char ship[]);
+void log_current_move(int current_player, Coordinate target, char result);
+void log_sunk_ship(int current_player, char ship_name[]);
+void log_player_stats(Stats stats1, Stats stats2);
+void init_logfile(void);

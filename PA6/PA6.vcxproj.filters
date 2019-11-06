@@ -31,5 +31,8 @@
     <Text Include="..\..\MyFiles\comment_block.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="battleship.log">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
