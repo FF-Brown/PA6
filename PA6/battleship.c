@@ -634,6 +634,13 @@ bool win_condition(int current_player, int ship_health[][5])
 		has_won = true;
 	return has_won;
 }
+/*
+	Function: log_current_move()
+	Date Created: 11/6/2019
+	Description: Writes the results of the turn to the output file. Neglects sunk status of hit ship.
+	Preconditions: None
+	Postconditions: Result printed to file
+*/
 void log_current_move(int current_player, Coordinate target, char result)
 {
 	FILE* outfile = NULL;
@@ -644,13 +651,27 @@ void log_current_move(int current_player, Coordinate target, char result)
 		fprintf(outfile, "Player %d fired on (%d,%d). Miss!\n", current_player, target.x, target.y);
 	fclose(outfile);
 }
+/*
+	Function: log_sunk_ship()
+	Date Created: 11/6/2019
+	Description: Records sunk ship in file. 
+	Preconditions: Ship was sunk this turn
+	Postconditions: Record printed to file
+*/
 void log_sunk_ship(int current_player, char ship_name[])
 {
 	FILE* outfile = NULL;
 	outfile = fopen("battleship.log", "a");
-	fprintf(outfile, "Player %d sunk a %s!", current_player, ship_name);
+	fprintf(outfile, "Player %d sunk a %s!\n", current_player, ship_name);
 	fclose(outfile);
 }
+/*
+	Function: init_logfile()
+	Date Created: 11/6/2019
+	Description: Initializes log file by overwriting previous data and heading the file with a timestamp. My first time messing with time! Hah. Haha. Mainly wanted it for the date and it was easier to include all of it.
+	Preconditions: None.
+	Postconditions: File initialized
+*/
 void init_logfile(void)
 {
 	//struct to hold time
@@ -665,13 +686,20 @@ void init_logfile(void)
 	fprintf(outfile, "Battleship Game Log \n%s\n", ctime(&t));
 	fclose(outfile);
 }
+/*
+	Function: log_player_stats()
+	Date Created: 11/6/2019
+	Description: Calculates final statistics and outputs them to the file. 
+	Preconditions: Game over.
+	Postconditions: Stats output to file.
+*/
 void log_player_stats(Stats stats1, Stats stats2)
 {
-	//Dummy values for testing
-	stats1.hits = 5;
-	stats1.misses = 11;
-	stats2.hits = 10;
-	stats2.misses = 31;
+	////Dummy values for testing
+	//stats1.hits = 5;
+	//stats1.misses = 11;
+	//stats2.hits = 10;
+	//stats2.misses = 31;
 
 	stats1.shots = stats1.hits + stats1.misses;
 	stats2.shots = stats2.hits + stats2.misses;

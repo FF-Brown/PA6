@@ -211,8 +211,43 @@ void update_ship_health(char enemy_board[][MAX_COL], Coordinate target, int ship
 	Postconditions: Updates coordinate on board and prints results
 */
 void targeting_sequence(char enemy_board[][MAX_COL], int ship_health[][5], int current_player, Stats* stats);
+/*
+	Function: win_condition()
+	Date Created: 11/2/2019
+	Description: Checks if a player's ships have all sunk. Meant to indicate if the current player has won by checking the opposing player's ships.
+	Preconditions: None
+	Postconditions: Returns true/false
+*/
 bool win_condition(int current_player, int ship_health[][5]);
+/*
+	Function: log_current_move()
+	Date Created: 11/6/2019
+	Description: Writes the results of the turn to the output file. Neglects sunk status of hit ship.
+	Preconditions: None
+	Postconditions: Result printed to file
+*/
 void log_current_move(int current_player, Coordinate target, char result);
+/*
+	Function: log_sunk_ship()
+	Date Created: 11/6/2019
+	Description: Records sunk ship in file.
+	Preconditions: Ship was sunk this turn
+	Postconditions: Record printed to file
+*/
 void log_sunk_ship(int current_player, char ship_name[]);
-void log_player_stats(Stats stats1, Stats stats2);
+/*
+	Function: init_logfile()
+	Date Created: 11/6/2019
+	Description: Initializes log file by overwriting previous data and heading the file with a timestamp. My first time messing with time! Hah. Haha. Mainly wanted it for the date and it was easier to include all of it.
+	Preconditions: None.
+	Postconditions: File initialized
+*/
 void init_logfile(void);
+/*
+	Function: log_player_stats()
+	Date Created: 11/6/2019
+	Description: Calculates final statistics and outputs them to the file.
+	Preconditions: Game over.
+	Postconditions: Stats output to file.
+*/
+void log_player_stats(Stats stats1, Stats stats2);
