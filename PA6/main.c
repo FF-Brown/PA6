@@ -19,7 +19,6 @@ int main(void) {
 		{ 5, 4, 3, 3, 2}
 	};
 	int turn = 0, current_player = 0;
-	Coordinate target = { 0, 0 };
 	Stats stats1 = { 0, 0, 0, 0.0 };
 	Stats stats2 = { 0, 0, 0, 0.0 };
 	Stats stats_tot[2] = { {0,0,0,0.0},{0,0,0,0.0} };
